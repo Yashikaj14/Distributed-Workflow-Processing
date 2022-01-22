@@ -1,0 +1,90 @@
+[
+  {
+    "name": "workflow1",
+    "scheduled_at": 1641480759,
+    "completed_at": 1641480814,
+    "tasks": [
+      {
+        "name": "task1",
+        "started_at": 1641480759,
+        "completed_at": 1641480779,
+        "worker": "w1",
+        "cost": 20,
+        "dependencies": [],
+        "description": "Fetch customer data"
+      },
+      {
+        "name": "task2",
+        "started_at": 1641480779,
+        "completed_at": 1641480789,
+        "worker": "w1",
+        "cost": 10,
+        "dependencies": [
+          "task1"
+        ],
+        "description": "Extract order information"
+      },
+      {
+        "name": "task3",
+        "started_at": 1641480789,
+        "completed_at": 1641480799,
+        "worker": "w2",
+        "cost": 10,
+        "dependencies": [
+          "task2"
+        ],
+        "description": "Run Order validation rules"
+      },
+      {
+        "name": "task4",
+        "started_at": 1641480789,
+        "completed_at": 1641480804,
+        "worker": "w1",
+        "cost": 15,
+        "dependencies": [
+          "task2"
+        ],
+        "description": "Run Company validation rules"
+      },
+      {
+        "name": "task5",
+        "started_at": 1641480804,
+        "completed_at": 1641480814,
+        "worker": "w1",
+        "cost": 10,
+        "dependencies": [
+          "task3",
+          "task4"
+        ],
+        "description": "Post validation results"
+      }
+    ]
+  },
+  {
+    "name": "workflow3",
+    "scheduled_at": 1641480799,
+    "completed_at": 1641480809,
+    "tasks": [
+      {
+        "name": "task1",
+        "started_at": 1641480799,
+        "completed_at": 1641480804,
+        "worker": "w2",
+        "cost": 5,
+        "dependencies": [],
+        "description": "Fetch customer data"
+      },
+      {
+        "name": "task2",
+        "started_at": 1641480804,
+        "completed_at": 1641480809,
+        "worker": "w2",
+        "cost": 5,
+        "dependencies": [
+          "task1"
+        ],
+        "description": "Extract personal customer information"
+      }
+    ]
+  }
+]

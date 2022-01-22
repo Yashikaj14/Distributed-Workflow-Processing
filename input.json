@@ -1,0 +1,67 @@
+[
+  {
+    "name": "workflow1",
+    "scheduled_at": 1641480759,
+    "tasks": [
+      {
+        "name": "task1",
+        "description": "Fetch customer data",
+        "cost": 20,
+        "dependencies": []
+      },
+      {
+        "name": "task2",
+        "description": "Extract order information",
+        "cost": 10,
+        "dependencies": [
+          "task1"
+        ]
+      },
+      {
+        "name": "task3",
+        "description": "Run Order validation rules",
+        "cost": 10,
+        "dependencies": [
+          "task2"
+        ]
+      },
+      {
+        "name": "task4",
+        "description": "Run Company validation rules",
+        "cost": 15,
+        "dependencies": [
+          "task2"
+        ]
+      },
+      {
+        "name": "task5",
+        "description": "Post validation results",
+        "cost": 10,
+        "dependencies": [
+          "task3",
+          "task4"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "workflow3" ,
+    "scheduled_at": 1641480799 ,
+    "tasks" : [
+      {
+        "name": "task1" ,
+        "description" : "Fetch customer data" ,
+        "cost": 5,
+        "dependencies" : []
+      },
+      {
+        "name": "task2" ,
+        "description" : "Extract personal customer information" ,
+        "cost": 5,
+        "dependencies" : [
+          "task1"
+        ]
+      }
+    ]
+  }
+]
