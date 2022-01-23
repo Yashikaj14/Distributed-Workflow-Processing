@@ -7,6 +7,9 @@ import java.util.Queue;
 
 public class SimpleScheduler implements WorkflowScheduler{
 
+    PriorityQueue<Task> readyTaskQueue;
+    Queue<Task> runningTaskQueue;
+
     static class byStartTime implements Comparator<Workflow>{
         @Override
         public int compare(Workflow o1, Workflow o2) {
@@ -18,16 +21,13 @@ public class SimpleScheduler implements WorkflowScheduler{
     public void processWorkflow(Workflow[] workflows, int worker_count) {
         Arrays.sort(workflows, new byStartTime());
         long time = workflows[0].getScheduled_at();
-        PriorityQueue<Task> pq = new PriorityQueue<>(Comparator.comparingInt(Task::getCost).reversed());
-        Queue<Task> taskQueue = new PriorityQueue<>(Comparator.comparingLong(Task::getCompleted_at));
+        readyTaskQueue = new PriorityQueue<>(Comparator.comparingInt(Task::getCost).reversed());
+        runningTaskQueue = new PriorityQueue<>(Comparator.comparingLong(Task::getCompleted_at));
         boolean[] workers = new boolean[worker_count];
         for(int i=0;i<worker_count;i++)
             workers[i] = false;
-//        Map<Workflow, Integer> levelProcessed = new HashMap<>();
-//        for(Workflow workflow: workflows)
-//            levelProcessed.put(workflow, 0);
 
-        pq.addAll(workflows[0].level_graph.get(0));
+        readyTaskQueue.addAll(workflows[0].level_graph.get(0));
         int totalProcessed = 0;
 
 
@@ -37,29 +37,13 @@ public class SimpleScheduler implements WorkflowScheduler{
         }
         while(totalProcessed < totalCount){
             boolean prs = true;
-            for(Workflow workflow: workflows){
-                if(workflow.getScheduled_at() <= time){
-                    for(Task task: workflow.getTasks()){
-                        if(!task.isProcessed() && !pq.contains(task) && !taskQueue.contains(task)){
-                            boolean flag = true;
-                            for (String dep: task.getDependencies()){
-                                if(!workflow.taskMap.get(dep).isProcessed()){
-                                    flag = false;
-                                    break;
-                                }
-                            }
-                            if (flag)
-                                pq.add(task);
-                        }
-                    }
-                }
-            }
-            while(!pq.isEmpty() && (taskQueue.size() < worker_count)){
+            updatePendingTaskQueue(workflows, time);
+            while(!readyTaskQueue.isEmpty() && (runningTaskQueue.size() < worker_count)){
 
-                Task t = pq.poll();
+                Task t = readyTaskQueue.poll();
                 t.setStarted_at(time);
                 t.setCompleted_at(time + t.getCost());
-                taskQueue.add(t);
+                runningTaskQueue.add(t);
                 for(int i=0;i<worker_count;i++){
                     if(!workers[i]){
                         t.setWorker("w"+(i+1));
@@ -69,20 +53,14 @@ public class SimpleScheduler implements WorkflowScheduler{
                 }
             }
             boolean flag = true;
-            while (!taskQueue.isEmpty() && flag){
-                if(taskQueue.peek().getCompleted_at() <= time){
-                    Task t = taskQueue.poll();
+            while (!runningTaskQueue.isEmpty() && flag){
+                if(runningTaskQueue.peek().getCompleted_at() <= time){
+                    Task t = runningTaskQueue.poll();
                     t.setProcessed(true);
                     totalProcessed++;
                     prs = false;
                     int worker = t.getWorker().charAt(1) - '1';
                     workers[worker] = false;
-//                    if(t!=null){
-//
-//                    }
-//                    else {
-//                        break;
-//                    }
                 }
                 else {
                     flag = false;
@@ -90,6 +68,26 @@ public class SimpleScheduler implements WorkflowScheduler{
             }
             if(prs)
                 time++;
+        }
+    }
+
+    void updatePendingTaskQueue(Workflow[] workflows, long time){
+        for(Workflow workflow: workflows){
+            if(workflow.getScheduled_at() <= time){
+                for(Task task: workflow.getTasks()){
+                    if(!task.isProcessed() && !readyTaskQueue.contains(task) && !runningTaskQueue.contains(task)){
+                        boolean dependenciesProcessed = true;
+                        for (String dep: task.getDependencies()){
+                            if(!workflow.taskMap.get(dep).isProcessed()){
+                                dependenciesProcessed = false;
+                                break;
+                            }
+                        }
+                        if (dependenciesProcessed)
+                            readyTaskQueue.add(task);
+                    }
+                }
+            }
         }
     }
 }
