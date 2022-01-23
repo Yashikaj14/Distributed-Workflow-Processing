@@ -13,8 +13,22 @@ public class Task {
     private String description;
     transient public boolean processed = false;
     transient public int level = 0;
+    transient public Workflow workflow;
 
     public Task() {
+    }
+
+    public Task(Task t) {
+        this.name = t.name;
+        this.started_at = t.started_at;
+        this.completed_at = t.completed_at;
+        this.worker = t.worker;
+        this.cost = t.cost;
+        this.dependencies = t.dependencies;
+        this.description = t.description;
+        this.processed = t.processed;
+        this.level = t.level;
+        this.workflow = t.workflow;
     }
 
     public Task(String name, Long started_at, String worker, Integer cost, ArrayList<String> dependencies, String description) {

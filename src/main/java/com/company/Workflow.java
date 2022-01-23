@@ -64,6 +64,7 @@ public class Workflow {
          * */
 
         for(Task task : tasks){
+            task.workflow = this;
             task_graph.put(task, new ArrayList<>());
             taskMap.put(task.getName(), task);
         }
