@@ -31,10 +31,10 @@ public class OptimalScheduler implements WorkflowScheduler{
         for(Workflow workflow: workflows){
             totalTaskCount += workflow.tasks.size();
         }
-        xyz(workflows, readyTaskSet, runningTaskQueue, new HashSet<>(), worker_count, 0);
+        process(workflows, readyTaskSet, runningTaskQueue, new HashSet<>(), worker_count, 0);
     }
 
-    private Long xyz(Workflow[] workflows, Set<Task> readyTasks, Queue<Task> runningTasks, Set<String> completed, int workers, int taskProcessed){
+    private Long process(Workflow[] workflows, Set<Task> readyTasks, Queue<Task> runningTasks, Set<String> completed, int workers, int taskProcessed){
 
         // input readyQueue and runningQueue and number of available workers
         //if readyQueue is not empty all workers are busy
@@ -53,7 +53,7 @@ public class OptimalScheduler implements WorkflowScheduler{
                     t.setStarted_at(time);
                     t.setCompleted_at(time + t.getCost());
                     runningTasks.add(t);
-                    return xyz(workflows, readyTasks, runningTasks, completed, workers--, taskProcessed);
+                    return process(workflows, readyTasks, runningTasks, completed, workers--, taskProcessed);
                 }
                 else{
                     readyTasks.add(t);
@@ -100,7 +100,7 @@ public class OptimalScheduler implements WorkflowScheduler{
             Set<Task> readyTasksClone = cloneSet(readyTasks);
             Queue<Task> runningTasksClone = cloneQueue(runningTasks);
             System.out.println("" + readyTasksClone.size() +" " + runningTasksClone.size() + " work " + workers + " " + combination.size());
-            Long endTime = xyz(workflows, readyTasksClone,runningTasksClone,clone(completed),workers-combination.size(), taskProcessed);
+            Long endTime = process(workflows, readyTasksClone,runningTasksClone,clone(completed),workers-combination.size(), taskProcessed);
             for(Task t : combination) {
                 runningTasks.remove(t);
                 readyTasks.add(t);
@@ -117,7 +117,7 @@ public class OptimalScheduler implements WorkflowScheduler{
             runningTasks.add(t);
             readyTasks.remove(t);
         }
-        return xyz(workflows, readyTasks,runningTasks,completed,workers-optimalCombination.size(), taskProcessed);
+        return process(workflows, readyTasks,runningTasks,completed,workers-optimalCombination.size(), taskProcessed);
 
 
     }
