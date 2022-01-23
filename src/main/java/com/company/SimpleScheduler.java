@@ -35,15 +35,18 @@ public class SimpleScheduler implements WorkflowScheduler{
         for(Workflow workflow: workflows){
             totalCount += workflow.tasks.size();
         }
+        // main loop for the algorithm
         while(totalProcessed < totalCount){
             boolean prs = true;
             updatePendingTaskQueue(workflows, time);
+            // transferring tasks from ready queue to processing queue
             while(!readyTaskQueue.isEmpty() && (runningTaskQueue.size() < worker_count)){
 
                 Task t = readyTaskQueue.poll();
                 t.setStarted_at(time);
                 t.setCompleted_at(time + t.getCost());
                 runningTaskQueue.add(t);
+                // to set the worker
                 for(int i=0;i<worker_count;i++){
                     if(!workers[i]){
                         t.setWorker("w"+(i+1));
@@ -53,6 +56,7 @@ public class SimpleScheduler implements WorkflowScheduler{
                 }
             }
             boolean flag = true;
+            // executing the processing queue
             while (!runningTaskQueue.isEmpty() && flag){
                 if(runningTaskQueue.peek().getCompleted_at() <= time){
                     Task t = runningTaskQueue.poll();
@@ -70,7 +74,7 @@ public class SimpleScheduler implements WorkflowScheduler{
                 time++;
         }
     }
-
+    // check if any task is available to enter in the ready queue
     void updatePendingTaskQueue(Workflow[] workflows, long time){
         for(Workflow workflow: workflows){
             if(workflow.getScheduled_at() <= time){
